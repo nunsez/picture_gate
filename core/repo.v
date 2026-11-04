@@ -21,13 +21,13 @@ pub fn delete(mut pool sqlite.ConnectionPool, id i64) ! {
 	}!
 }
 
-pub struct Option[T] {
+pub struct Optional[T] {
 pub:
 	value ?T
 }
 
 // TODO: use conn instead of pool ?
-pub fn find(mut pool sqlite.ConnectionPool, id i64) !Option[Picture] {
+pub fn find(mut pool sqlite.ConnectionPool, id i64) !Optional[Picture] {
 	conn := pool.acquire()!
 	defer { pool.release(conn) }
 
@@ -35,7 +35,7 @@ pub fn find(mut pool sqlite.ConnectionPool, id i64) !Option[Picture] {
 		select from Picture where id == id
 	}!
 
-	return Option{rows[0]}
+	return Optional{rows[0]}
 }
 
 // TODO: use conn instead of pool ?
