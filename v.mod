@@ -3,5 +3,7 @@ Module {
 	description: ''
 	version: '0.0.0'
 	license: 'AGPLv3'
-	dependencies: []
+	dependencies: [
+	  'https://github.com/nunsez/datastar-v.git',
+	]
 }

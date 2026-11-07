@@ -1,0 +1,12 @@
+{
+    "version": 1,
+    "modules": {
+        "https://github.com/nunsez/datastar-v.git": {
+            "requested": "https://github.com/nunsez/datastar-v.git",
+            "resolved": "v0.0.0-20261107052754-9498a9ca0d91",
+            "revision": "9498a9ca0d91c8ae896eaf312f0366c8359eb155",
+            "url": "https://github.com/nunsez/datastar-v.git",
+            "hash": "456918c4969eb5c67b3d51c785896bb93ca8e3527fc23d2da6a6900f2daaa7e9"
+        }
+    }
+}

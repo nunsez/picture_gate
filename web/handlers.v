@@ -1,67 +1,13 @@
 module web
 
-import veb
 import db.sqlite
-import core
 import os
-import net.urllib
 import strconv
+import veb
+import core
 import walk
-import datastar
 
-pub struct Context {
-	veb.Context
-}
-
-fn (mut ctx Context) datastar_remove(selector string) veb.Result {
-	return ctx.send_response_to_client(datastar.sse, datastar.remove_event(selector))
-}
-
-fn (mut ctx Context) datastar_append(selector string, elements string) veb.Result {
-	return ctx.send_response_to_client(datastar.sse, datastar.append_event(selector, elements))
-}
-
-// TODO: simplify (net.urllib research)
-pub fn (ctx &Context) build_page_url(page u64) string {
-	mut params := ctx.query.clone()
-	params['page'] = page.str()
-
-	mut parts := []string{cap: params.len}
-	for k, v in params {
-		parts << '${urllib.query_escape(k)}=${urllib.query_escape(v)}'
-	}
-	parts.sort()
-
-	path := ctx.req.url.all_before('?')
-	q := parts.join('&')
-	return if q == '' { path } else { '${path}?${q}' }
-}
-
-pub struct App {
-	veb.StaticHandler
-	pool     sqlite.ConnectionPool
-	cfg_path string
-}
-
-pub fn run(port u16, cfg_path string, pool sqlite.ConnectionPool) ! {
-	mut app := App{ pool: pool, cfg_path: cfg_path }
-
-	app.enable_static_compression = true
-	app.mount_static_folder_at('static', '/public')!
-
-	veb.run[App, Context](mut app, port)
-}
-
-@[params]
-struct LayoutParams {
-	layout  string = 'main'
-	title   string = 'Picture Gate'
-	content string
-}
-
-fn (app &App) render_layout(params LayoutParams) string {
-	return $tmpl('templates/layouts/main.html')
-}
+const per_page = 30
 
 @['/']
 pub fn (app &App) index(mut ctx Context) !veb.Result {
@@ -73,8 +19,6 @@ pub fn (app &App) index(mut ctx Context) !veb.Result {
 	html := app.render_layout(content: $tmpl('templates/pending.html'))
 	return ctx.html(html)
 }
-
-const per_page = 30
 
 @['/declined']
 pub fn (app &App) declined(mut ctx Context) !veb.Result {
@@ -102,16 +46,6 @@ pub fn (app &App) accepted(mut ctx Context) !veb.Result {
 	)
 	html := app.render_layout(content: $tmpl('templates/accepted.html'))
 	return ctx.html(html)
-}
-
-enum PageKind {
-	pending
-	accepted
-	declined
-}
-
-fn PageKind.from_ctx(ctx Context) !PageKind {
-	return PageKind.from(ctx.form['pageKind'])!
 }
 
 @['/accept/:id'; patch]
@@ -186,6 +120,25 @@ fn handle_scan(cfg_path string, mut pool sqlite.ConnectionPool) {
 	walk.run_with_new_config(cfg_path, mut conn) or {
 		eprintln('run with config error: ${err}')
 		return
+	}
+}
+
+@['/sfw/:id'; post]
+pub fn (app &App) sfw(mut ctx Context, id i64) !veb.Result {
+	kind := PageKind.from_ctx(ctx) or {
+		return ctx.request_error('bad kind')
+	}
+
+	core.sfw(mut app.pool, id) or {
+		return ctx.datastar_script('alert("${err}")')
+	}
+
+	match kind {
+		.pending { return ctx.redirect('/') }
+		.accepted, .declined {
+			selector := '#${core.Picture.dom_id(id)}'
+			return ctx.datastar_remove(selector)
+		}
 	}
 }
 
