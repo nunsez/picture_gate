@@ -3,10 +3,10 @@
     "modules": {
         "https://github.com/nunsez/datastar-v.git": {
             "requested": "https://github.com/nunsez/datastar-v.git",
-            "resolved": "v0.0.0-20261107052754-9498a9ca0d91",
-            "revision": "9498a9ca0d91c8ae896eaf312f0366c8359eb155",
+            "resolved": "v0.0.0-20261108032503-9a794558584c",
+            "revision": "9a794558584c1ac49f5817b3fa71f29ef67acbdb",
             "url": "https://github.com/nunsez/datastar-v.git",
-            "hash": "456918c4969eb5c67b3d51c785896bb93ca8e3527fc23d2da6a6900f2daaa7e9"
+            "hash": "27fd9c20362c80e09935fbd8ef51d80857e2fc57946930c7f92249535062493f"
         }
     }
 }
