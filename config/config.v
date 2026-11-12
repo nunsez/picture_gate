@@ -24,3 +24,15 @@ pub fn parse(config_path string) !Config {
 	cfg := json2.decode[Config](content, strict: true)!
 	return cfg
 }
+
+pub fn (cfg &Config) override_root(path string) ?string {
+	for wc in cfg.walk {
+		override := wc.override or {
+			continue
+		}
+		if path.starts_with(wc.root) {
+			return path.replace_once(wc.root, override)
+		}
+	}
+	return none
+}

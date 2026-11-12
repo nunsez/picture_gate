@@ -144,12 +144,8 @@ pub fn (app &App) sfw(mut ctx Context, id i64) !veb.Result {
 // FIXME: send only needed pictures, not any files
 @['/:path...']
 pub fn (app &App) fallback(mut ctx Context, path string) veb.Result {
-	for wc in app.cfg.walk {
-		override := wc.override or { continue }
-		if path.starts_with(wc.root) {
-			overrided := path.replace_once(wc.root, override)
-			return ctx.file(overrided)
-		}
+	if overrided := app.cfg.override_root(path) {
+		return ctx.file(overrided)
 	}
 	return ctx.file(path)
 }
