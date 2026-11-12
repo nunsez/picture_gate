@@ -25,7 +25,7 @@ fn main() {
 		spawn report_picture_statuses(&pool, cfg.report_interval)
 	}
 
-	web.run(cfg.port, cfg_path, pool)!
+	web.run(cfg.port, cfg, cfg_path, pool)!
 }
 
 fn report_picture_statuses(pool &sqlite.ConnectionPool, interval u32) {

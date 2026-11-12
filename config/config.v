@@ -14,8 +14,9 @@ pub:
 
 pub struct WalkConfig {
 pub:
-	root    string
-	exclude []string
+	root     string
+	override ?string
+	exclude  []string
 }
 
 pub fn parse(config_path string) !Config {
